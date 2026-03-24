@@ -78,7 +78,6 @@ function call_openai_structured(mixed $input, array $schema, string $prompt, str
     $raw = curl_exec($ch);
     $err = curl_error($ch);
     $code = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-    curl_close($ch);
 
     $debug = [
         'openai_request_payload' => $payload,

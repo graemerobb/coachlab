@@ -27,21 +27,17 @@ OPENAI_MODEL=gpt-4o
 ./run_local.sh
 ```
 
+On Windows, use:
+
+```bat
+run_local.bat
+```
+
 4. Open:
 
 ```text
 http://127.0.0.1:8000/coachlab/coachlab.html
 ```
-
-You can also open:
-
-```text
-http://127.0.0.1:8000/coachlab.html
-```
-
-## Why The Router Exists
-
-The app uses `/coachlab/...` paths in the frontend. `router.php` makes the built-in PHP server behave more like the deployed site, so those URLs still work locally.
 
 ## Where Data Saves
 
@@ -64,6 +60,6 @@ You can zip the repo and send it to them. They only need:
 
 - PHP installed
 - the repo contents
-- to run `./run_local.sh`
+- to run `./run_local.sh` on macOS/Linux or `run_local.bat` on Windows
 
 If they do not need elite-player matching, they can leave `OPENAI_API_KEY` blank.

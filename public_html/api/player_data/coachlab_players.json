@@ -1,0 +1,366 @@
+{
+    "ok": true,
+    "_type": "coachlab_player_data",
+    "_saved_at": "2026-03-24T03:29:28+00:00",
+    "activeTeamId": "9mhpezjguua",
+    "teams": [
+        {
+            "id": "9mhpezjguua",
+            "name": "My Team",
+            "ageGroup": "U15-U18",
+            "formation": "4-3-3",
+            "squad": [
+                {
+                    "id": "b8ybyyeydmw",
+                    "name": "Boaby",
+                    "primaryPos": "CM",
+                    "secondaryPos": [],
+                    "attributes": [],
+                    "coachRatings": {
+                        "first_touch": 20,
+                        "passing_short": 6,
+                        "receiving": 20,
+                        "crossing": 20,
+                        "heading": 20,
+                        "shielding": 20,
+                        "speed": 4,
+                        "agility": 3,
+                        "strength": 19,
+                        "stamina": 5,
+                        "coordination": 8,
+                        "reactions": 13,
+                        "jumping": 19,
+                        "positioning": 18,
+                        "pressing": 5,
+                        "transition_attack": 4,
+                        "transition_defence": 4,
+                        "decision_making": 4,
+                        "scanning_awareness": 4,
+                        "shape_and_structure": 8,
+                        "width_and_depth": 4,
+                        "combinations": 11,
+                        "defensive_organisation": 3,
+                        "communication": 15,
+                        "leadership": 20,
+                        "composure": 20,
+                        "concentration": 14,
+                        "coachability": 11,
+                        "competitiveness": 9,
+                        "finishing": 20,
+                        "ball_control": 13,
+                        "dribbling": 3,
+                        "passing_long": 4
+                    },
+                    "coachRatingCategories": {
+                        "Technical": {
+                            "label": "Technical",
+                            "ratings": {
+                                "first_touch": 20,
+                                "passing_short": 6,
+                                "passing_long": 4,
+                                "receiving": 20,
+                                "dribbling": 3,
+                                "ball_control": 13,
+                                "finishing": 20,
+                                "crossing": 20,
+                                "heading": 20,
+                                "shielding": 20
+                            }
+                        },
+                        "Physical": {
+                            "label": "Physical",
+                            "ratings": {
+                                "speed": 4,
+                                "agility": 3,
+                                "stamina": 5,
+                                "strength": 19,
+                                "coordination": 8,
+                                "reactions": 13,
+                                "jumping": 19
+                            }
+                        },
+                        "Tactical": {
+                            "label": "Tactical",
+                            "ratings": {
+                                "positioning": 18,
+                                "pressing": 5,
+                                "transition_attack": 4,
+                                "transition_defence": 4,
+                                "decision_making": 4,
+                                "scanning_awareness": 4,
+                                "shape_and_structure": 8,
+                                "width_and_depth": 4,
+                                "combinations": 11,
+                                "defensive_organisation": 3
+                            }
+                        },
+                        "Mental": {
+                            "label": "Mental",
+                            "ratings": {
+                                "communication": 15,
+                                "leadership": 20,
+                                "composure": 20,
+                                "concentration": 14,
+                                "coachability": 11,
+                                "competitiveness": 9
+                            }
+                        }
+                    },
+                    "selfRatings": [],
+                    "selfRatingCategories": {
+                        "Technical": {
+                            "label": "Technical",
+                            "ratings": []
+                        },
+                        "Physical": {
+                            "label": "Physical",
+                            "ratings": []
+                        },
+                        "Tactical": {
+                            "label": "Tactical",
+                            "ratings": []
+                        },
+                        "Mental": {
+                            "label": "Mental",
+                            "ratings": []
+                        }
+                    },
+                    "notes": "",
+                    "wellbeing": {
+                        "motivation": 0,
+                        "happiness": 0
+                    },
+                    "goals": [],
+                    "snapshots": [],
+                    "idpTargets": [],
+                    "idpActions": "",
+                    "idpReviewDate": ""
+                }
+            ],
+            "assignments": [],
+            "gameModel": {
+                "P1": [],
+                "P2": [],
+                "P3": [],
+                "P4": []
+            },
+            "priorities": [],
+            "duration": 75,
+            "squadSize": 16,
+            "seasonPlan": [
+                {
+                    "id": "n9fcwi82af",
+                    "theme": "Technical Foundation",
+                    "weeks": [
+                        {
+                            "id": "tcmt4ucxrz",
+                            "label": "Week 1",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "th7amtqttw8",
+                            "label": "Week 2",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "lk08ahku5tn",
+                            "label": "Week 3",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "6lti3wtp6c4",
+                            "label": "Week 4",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        }
+                    ],
+                    "open": true
+                },
+                {
+                    "id": "8xxap5b81aq",
+                    "theme": "Pressing & Press-Resistance",
+                    "weeks": [
+                        {
+                            "id": "etl9ynsajyq",
+                            "label": "Week 5",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "dq4bsjbfvel",
+                            "label": "Week 6",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "nntfv3e92oj",
+                            "label": "Week 7",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "ka0w9kan85n",
+                            "label": "Week 8",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        }
+                    ],
+                    "open": false
+                },
+                {
+                    "id": "fzq56x1erl",
+                    "theme": "Build-Up Play",
+                    "weeks": [
+                        {
+                            "id": "jbqqilfugvf",
+                            "label": "Week 9",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "u745kykyucl",
+                            "label": "Week 10",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "zuhfwhfu0lo",
+                            "label": "Week 11",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "4gzkizpx3fb",
+                            "label": "Week 12",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        }
+                    ],
+                    "open": false
+                },
+                {
+                    "id": "fvwrns3je2b",
+                    "theme": "Attacking Combinations",
+                    "weeks": [
+                        {
+                            "id": "ojcoahqx15l",
+                            "label": "Week 13",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "vyobbfdgqu",
+                            "label": "Week 14",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "d1j59by5q4j",
+                            "label": "Week 15",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "9h093beib3g",
+                            "label": "Week 16",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        }
+                    ],
+                    "open": false
+                },
+                {
+                    "id": "sr8ioazm4ug",
+                    "theme": "Defensive Organisation",
+                    "weeks": [
+                        {
+                            "id": "j3vkrcjyi3",
+                            "label": "Week 17",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "x7d3cchv10d",
+                            "label": "Week 18",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "t4upwcy64df",
+                            "label": "Week 19",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "bmfncpn74gl",
+                            "label": "Week 20",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        }
+                    ],
+                    "open": false
+                },
+                {
+                    "id": "mvoankskzqa",
+                    "theme": "Transition Play",
+                    "weeks": [
+                        {
+                            "id": "r0jdew7j1t",
+                            "label": "Week 21",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "uc8g67ipau",
+                            "label": "Week 22",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "vu1t2fxjfsb",
+                            "label": "Week 23",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        },
+                        {
+                            "id": "vkqbyvy8m1e",
+                            "label": "Week 24",
+                            "session1": null,
+                            "session2": null,
+                            "notes": ""
+                        }
+                    ],
+                    "open": false
+                }
+            ],
+            "weakAttrs": [],
+            "analysed": false
+        }
+    ]
+}
