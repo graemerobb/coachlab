@@ -265,6 +265,29 @@ function buildEliteMatchPayload(player, team) {
     },
   };
 }
+function buildSnapshotPayload(player, team, snapshot) {
+  return {
+    _type: 'coachlab_player_snapshot',
+    savedAt: new Date().toISOString(),
+    team: {
+      id: team.id,
+      name: team.name,
+      ageGroup: team.ageGroup,
+    },
+    player: {
+      id: player.id,
+      name: player.name,
+      primaryPos: player.primaryPos,
+      secondaryPos: player.secondaryPos || [],
+      coachRatings: player.coachRatings || {},
+      coachRatingCategories: player.coachRatingCategories || buildCategorizedRatings(team.ageGroup, player.coachRatings || {}),
+      notes: player.notes || '',
+      wellbeing: player.wellbeing || {},
+      goals: player.goals || {},
+    },
+    snapshot,
+  };
+}
 
 const ATTR_LBL = {
   first_touch:'First Touch',passing_short:'Short Pass',passing_long:'Long Pass',receiving:'Receiving',dribbling:'Dribbling',ball_control:'Ball Control',finishing:'Finishing',shooting:'Shooting',crossing:'Crossing',heading:'Heading',shielding:'Shielding',
@@ -1678,7 +1701,10 @@ function saveSnapshot(player, updatePlayer) {
   // Replace if same date already exists
   const filtered = existing.filter(s=>s.date!==snap.date);
   updatePlayer({snapshots:[...filtered,snap]});
-  return existing.some(s=>s.date===snap.date) ? 'Snapshot updated for today' : 'Snapshot saved';
+  return {
+    snapshot: snap,
+    message: existing.some(s=>s.date===snap.date) ? 'Snapshot updated for today' : 'Snapshot saved',
+  };
 }
 
 function PlayersTab({team,updateTeam}) {
@@ -1743,6 +1769,18 @@ function PlayersTab({team,updateTeam}) {
     const cur=player.secondaryPos||[];
     const next=cur.includes(pos)?cur.filter(p=>p!==pos):[...cur,pos];
     updatePlayer({secondaryPos:next});
+  }
+  async function persistSnapshotToFile(snapshot){
+    const res = await fetch('/coachlab/api/save_snapshot.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(buildSnapshotPayload(player, team, snapshot)),
+    });
+    const data = await res.json().catch(()=>null);
+    if (!res.ok) {
+      throw new Error(data?.error || data?.message || `Snapshot save failed (${res.status})`);
+    }
+    return data;
   }
 
   if(!team.squad.length) return(
@@ -1882,10 +1920,16 @@ function PlayersTab({team,updateTeam}) {
           <div className="card" style={{marginBottom:'1rem'}}>
             <div className="ch">
               <span className="ct">{mode==='coach'?'Coach Ratings (1–20)':'Self-Assessment (1–20)'}</span>
-              {mode==='coach'&&<button className="btn btn-s btn-xs" style={{marginLeft:'auto'}} onClick={()=>{
-                const msg = saveSnapshot({...player, ageGroup: team.ageGroup},updatePlayer);
-                setImportMsg({ok:true,msg:`✓ ${msg}`});
-                setTimeout(()=>setImportMsg(null),3000);
+              {mode==='coach'&&<button className="btn btn-s btn-xs" style={{marginLeft:'auto'}} onClick={async ()=>{
+                const {snapshot, message} = saveSnapshot({...player, ageGroup: team.ageGroup},updatePlayer);
+                setImportMsg({ok:true,msg:`✓ ${message} locally...`});
+                try{
+                  const data = await persistSnapshotToFile(snapshot);
+                  setImportMsg({ok:true,msg:`✓ ${message}. File saved to ${data.path||'player_data'}`});
+                }catch(err){
+                  setImportMsg({ok:false,msg:`${message}, but filesystem save failed: ${err.message}`});
+                }
+                setTimeout(()=>setImportMsg(null),5000);
               }}>📸 Save Snapshot</button>}
             </div>
             <div className="cb">
