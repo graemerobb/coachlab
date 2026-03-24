@@ -1,0 +1,196 @@
+{
+  "_type": "coachlab_elite_match_request",
+  "requestedAt": "2026-03-24T10:30:00Z",
+  "team": {
+    "id": "team_u15_001",
+    "name": "CoachLab U15s",
+    "ageGroup": "U15-U18"
+  },
+  "player": {
+    "id": "player_001",
+    "name": "Ethan Carter",
+    "primaryPos": "CM",
+    "secondaryPos": ["DM", "AM"],
+    "coachRatings": {
+      "first_touch": 16,
+      "passing_short": 15,
+      "passing_long": 12,
+      "receiving": 16,
+      "dribbling": 13,
+      "ball_control": 15,
+      "finishing": 8,
+      "shooting": 9,
+      "crossing": 7,
+      "heading": 5,
+      "shielding": 12,
+      "speed": 10,
+      "agility": 13,
+      "stamina": 15,
+      "strength": 9,
+      "coordination": 13,
+      "reactions": 11,
+      "jumping": 6,
+      "positioning": 14,
+      "pressing": 13,
+      "transition_attack": 14,
+      "transition_defence": 12,
+      "decision_making": 15,
+      "scanning_awareness": 16,
+      "shape_and_structure": 14,
+      "width_and_depth": 10,
+      "combinations": 15,
+      "defensive_organisation": 11,
+      "communication": 12,
+      "leadership": 10,
+      "composure": 15,
+      "concentration": 13,
+      "coachability": 16,
+      "competitiveness": 13
+    },
+    "coachRatingCategories": {
+      "Technical": {
+        "label": "Technical",
+        "ratings": {
+          "first_touch": 16,
+          "passing_short": 15,
+          "passing_long": 12,
+          "receiving": 16,
+          "dribbling": 13,
+          "ball_control": 15,
+          "finishing": 8,
+          "shooting": 9,
+          "crossing": 7,
+          "heading": 5,
+          "shielding": 12
+        }
+      },
+      "Physical": {
+        "label": "Physical",
+        "ratings": {
+          "speed": 10,
+          "agility": 13,
+          "stamina": 15,
+          "strength": 9,
+          "coordination": 13,
+          "reactions": 11,
+          "jumping": 6
+        }
+      },
+      "Tactical": {
+        "label": "Tactical",
+        "ratings": {
+          "positioning": 14,
+          "pressing": 13,
+          "transition_attack": 14,
+          "transition_defence": 12,
+          "decision_making": 15,
+          "scanning_awareness": 16,
+          "shape_and_structure": 14,
+          "width_and_depth": 10,
+          "combinations": 15,
+          "defensive_organisation": 11
+        }
+      },
+      "Mental": {
+        "label": "Mental",
+        "ratings": {
+          "communication": 12,
+          "leadership": 10,
+          "composure": 15,
+          "concentration": 13,
+          "coachability": 16,
+          "competitiveness": 13
+        }
+      }
+    },
+    "notes": "Technically clean central midfielder. Receives well under pressure, scans early, and links play quickly. Not explosive, but reads the game well and can control tempo.",
+    "wellbeing": {
+      "motivation": 5,
+      "happiness": 4
+    },
+    "goals": {
+      "shortTerm": "Play forward earlier after scanning.",
+      "season": "Become the most reliable central midfielder in the squad."
+    },
+    "snapshots": [
+      {
+        "date": "2026-02-10",
+        "ratings": {
+          "first_touch": 14,
+          "passing_short": 14,
+          "receiving": 14,
+          "decision_making": 13,
+          "scanning_awareness": 14,
+          "composure": 13
+        },
+        "categories": {
+          "Technical": {
+            "label": "Technical",
+            "ratings": {
+              "first_touch": 14,
+              "passing_short": 14,
+              "receiving": 14
+            }
+          },
+          "Tactical": {
+            "label": "Tactical",
+            "ratings": {
+              "decision_making": 13,
+              "scanning_awareness": 14
+            }
+          },
+          "Mental": {
+            "label": "Mental",
+            "ratings": {
+              "composure": 13
+            }
+          },
+          "Physical": {
+            "label": "Physical",
+            "ratings": {}
+          }
+        },
+        "ovr": 13.7
+      },
+      {
+        "date": "2026-03-24",
+        "ratings": {
+          "first_touch": 16,
+          "passing_short": 15,
+          "receiving": 16,
+          "decision_making": 15,
+          "scanning_awareness": 16,
+          "composure": 15
+        },
+        "categories": {
+          "Technical": {
+            "label": "Technical",
+            "ratings": {
+              "first_touch": 16,
+              "passing_short": 15,
+              "receiving": 16
+            }
+          },
+          "Tactical": {
+            "label": "Tactical",
+            "ratings": {
+              "decision_making": 15,
+              "scanning_awareness": 16
+            }
+          },
+          "Mental": {
+            "label": "Mental",
+            "ratings": {
+              "composure": 15
+            }
+          },
+          "Physical": {
+            "label": "Physical",
+            "ratings": {}
+          }
+        },
+        "ovr": 14.8
+      }
+    ]
+  }
+}
