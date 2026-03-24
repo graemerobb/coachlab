@@ -208,6 +208,40 @@ function grpLabel(grp) {
 function getAllAttrKeys(ageGroup) {
   return Object.values(getAttrs(ageGroup)).flat();
 }
+function buildCategorizedRatings(ageGroup, ratings={}) {
+  const grouped = {};
+  Object.entries(getAttrs(ageGroup)).forEach(([grp, attrs]) => {
+    const values = {};
+    attrs.forEach(attr => {
+      if (typeof ratings[attr] === 'number' && ratings[attr] > 0) values[attr] = ratings[attr];
+    });
+    grouped[grp] = {label: grpLabel(grp), ratings: values};
+  });
+  return grouped;
+}
+function normalizePlayer(player, ageGroup) {
+  const coachRatings = player.coachRatings || {};
+  const selfRatings = player.selfRatings || {};
+  const snapshots = (player.snapshots || []).map(s => ({
+    ...s,
+    ratings: s.ratings || {},
+    categories: s.categories || buildCategorizedRatings(ageGroup, s.ratings || {}),
+  }));
+  return {
+    ...player,
+    coachRatings,
+    selfRatings,
+    coachRatingCategories: player.coachRatingCategories || buildCategorizedRatings(ageGroup, coachRatings),
+    selfRatingCategories: player.selfRatingCategories || buildCategorizedRatings(ageGroup, selfRatings),
+    snapshots,
+  };
+}
+function normalizeTeam(team) {
+  return {
+    ...team,
+    squad: (team.squad || []).map(player => normalizePlayer(player, team.ageGroup || 'U15-U18')),
+  };
+}
 
 const ATTR_LBL = {
   first_touch:'First Touch',passing_short:'Short Pass',passing_long:'Long Pass',receiving:'Receiving',dribbling:'Dribbling',ball_control:'Ball Control',finishing:'Finishing',shooting:'Shooting',crossing:'Crossing',heading:'Heading',shielding:'Shielding',
@@ -351,7 +385,7 @@ function buildDefaultSeason() {
 }
 
 function newPlayer(name='',pos='CM') {
-  return {id:uid(),name,primaryPos:pos,secondaryPos:[],attributes:{},coachRatings:{},selfRatings:{},notes:'',wellbeing:{motivation:0,happiness:0},goals:{},snapshots:[],idpTargets:{},idpActions:'',idpReviewDate:''};
+  return {id:uid(),name,primaryPos:pos,secondaryPos:[],attributes:{},coachRatings:{},coachRatingCategories:buildCategorizedRatings('U15-U18',{}),selfRatings:{},selfRatingCategories:buildCategorizedRatings('U15-U18',{}),notes:'',wellbeing:{motivation:0,happiness:0},goals:{},snapshots:[],idpTargets:{},idpActions:'',idpReviewDate:''};
 }
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
@@ -360,7 +394,7 @@ function App() {
   const [teams, setTeams] = useState(() => {
     try {
       const saved = localStorage.getItem('frp_teams');
-      if (saved) { const parsed = JSON.parse(saved); if (parsed && parsed.length) return parsed; }
+      if (saved) { const parsed = JSON.parse(saved); if (parsed && parsed.length) return parsed.map(normalizeTeam); }
     } catch(e) {}
     return [newTeam('My Team')];
   });
@@ -1614,12 +1648,14 @@ function saveSnapshot(player, updatePlayer) {
   const snap = {
     date: new Date().toISOString().slice(0,10),
     ratings: {...player.coachRatings},
+    categories: buildCategorizedRatings(player.ageGroup, player.coachRatings),
     ovr: avg20(player.coachRatings),
   };
   const existing = player.snapshots||[];
   // Replace if same date already exists
   const filtered = existing.filter(s=>s.date!==snap.date);
   updatePlayer({snapshots:[...filtered,snap]});
+  return existing.some(s=>s.date===snap.date) ? 'Snapshot updated for today' : 'Snapshot saved';
 }
 
 function PlayersTab({team,updateTeam}) {
@@ -1633,7 +1669,17 @@ function PlayersTab({team,updateTeam}) {
   const player=team.squad.find(p=>p.id===pid)||null;
 
   function updatePlayer(updates){
-    updateTeam({squad:team.squad.map(p=>p.id!==pid?p:{...p,...updates})});
+    updateTeam({squad:team.squad.map(p=>{
+      if (p.id!==pid) return p;
+      const next = {...p,...updates};
+      const coachRatings = next.coachRatings || {};
+      const selfRatings = next.selfRatings || {};
+      return {
+        ...next,
+        coachRatingCategories: buildCategorizedRatings(team.ageGroup, coachRatings),
+        selfRatingCategories: buildCategorizedRatings(team.ageGroup, selfRatings),
+      };
+    })});
   }
 
   function importReflection(file){
@@ -1648,8 +1694,10 @@ function PlayersTab({team,updateTeam}) {
           setImportMsg({ok:false,msg:`No player named "${data.playerName}" found in this squad. Check the name matches exactly.`});
           return;
         }
+        const selfRatings={...match.selfRatings,...(data.selfRatings||{})};
         const updates={
-          selfRatings:{...match.selfRatings,...(data.selfRatings||{})},
+          selfRatings,
+          selfRatingCategories: buildCategorizedRatings(team.ageGroup, selfRatings),
           goals:{...match.goals,...(data.goals||{})},
           wellbeing:{...match.wellbeing,...(data.wellbeing||{})},
         };
@@ -1809,7 +1857,11 @@ function PlayersTab({team,updateTeam}) {
           <div className="card" style={{marginBottom:'1rem'}}>
             <div className="ch">
               <span className="ct">{mode==='coach'?'Coach Ratings (1–20)':'Self-Assessment (1–20)'}</span>
-              {mode==='coach'&&<button className="btn btn-s btn-xs" style={{marginLeft:'auto'}} onClick={()=>saveSnapshot(player,updatePlayer)}>📸 Save Snapshot</button>}
+              {mode==='coach'&&<button className="btn btn-s btn-xs" style={{marginLeft:'auto'}} onClick={()=>{
+                const msg = saveSnapshot({...player, ageGroup: team.ageGroup},updatePlayer);
+                setImportMsg({ok:true,msg:`✓ ${msg}`});
+                setTimeout(()=>setImportMsg(null),3000);
+              }}>📸 Save Snapshot</button>}
             </div>
             <div className="cb">
               {Object.entries(getAttrs(team.ageGroup)).map(([grp,attrs])=>(
@@ -2210,7 +2262,7 @@ function importAllData(file,teams,setTeams,setActiveTeamId,onDone) {
     try{
       const data=JSON.parse(e.target.result);
       if(data._type!=='coachlab_backup'){onDone({ok:false,msg:'Not a valid Coachlab backup file.'});return;}
-      const importedTeams=data.teams||[];
+      const importedTeams=(data.teams||[]).map(normalizeTeam);
       const merged=[...teams];
       importedTeams.forEach(it=>{
         const idx=merged.findIndex(t=>t.id===it.id);
