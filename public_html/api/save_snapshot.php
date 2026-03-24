@@ -28,8 +28,7 @@ function coachlab_player_data_dir(): string
 {
     $candidates = [
         getenv('COACHLAB_PLAYER_DATA_DIR') ?: '',
-        '/var/www/player_data',
-        __DIR__ . '/../../player_data',
+        __DIR__ . '/player_data',
     ];
 
     foreach ($candidates as $candidate) {
@@ -46,7 +45,7 @@ function coachlab_player_data_dir(): string
         }
     }
 
-    return rtrim(sys_get_temp_dir(), '/') . '/coachlab_player_data';
+    return __DIR__ . '/player_data';
 }
 
 function safe_segment(string $value, string $fallback): string
