@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Self-Reflection</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f7f4;--white:#fff;--green:#2ea043;--gb:#3a7d44;--light:#e8f5e9;
+  --txt:#1a2e1a;--txt2:#4a6450;--txt3:#7a9a7a;--bdr:#c8dcc8;
+  --rating-1:#e53935;--rating-2:#ef6c00;--rating-3:#f9a825;
+  --rating-4:#7cb342;--rating-5:#2e7d32;
+}
+body{background:var(--bg);font-family:'Segoe UI',Arial,sans-serif;color:var(--txt);min-height:100vh;font-size:15px}
+@media print{body{background:#fff}.no-print{display:none!important}.page-break{page-break-before:always}}
+
+.header{background:linear-gradient(135deg,#1a4a2e,#2e7d44);color:#fff;padding:2rem 1.5rem;text-align:center}
+.header h1{font-size:1.7rem;font-weight:700;letter-spacing:.04em;margin-bottom:.3rem}
+.header p{opacity:.8;font-size:.9rem}
+.logo-strip{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-bottom:.8rem}
+.logo-icon{width:36px;height:36px;background:#3fb950;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+
+.container{max-width:680px;margin:0 auto;padding:1.5rem 1rem}
+
+.card{background:var(--white);border:1px solid var(--bdr);border-radius:10px;overflow:hidden;margin-bottom:1.2rem;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card-header{background:var(--light);border-bottom:1px solid var(--bdr);padding:.7rem 1.1rem;display:flex;align-items:center;gap:.5rem}
+.card-header h2{font-size:1rem;font-weight:700;color:var(--gb);letter-spacing:.03em}
+.card-body{padding:1.1rem}
+
+.field-group{margin-bottom:1rem}
+.field-group:last-child{margin-bottom:0}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--txt2);margin-bottom:.35rem;letter-spacing:.02em}
+input[type=text],textarea,select{width:100%;padding:.55rem .8rem;border:1px solid var(--bdr);border-radius:6px;font-size:.9rem;font-family:inherit;color:var(--txt);background:#fff;transition:border .15s}
+input[type=text]:focus,textarea:focus,select:focus{outline:none;border-color:var(--green)}
+textarea{resize:vertical;min-height:72px;line-height:1.5}
+.helper{font-size:.76rem;color:var(--txt3);margin-top:.28rem;line-height:1.4}
+
+.attr-row{display:flex;align-items:center;gap:.7rem;padding:.6rem 0;border-bottom:1px solid #f0f4f0}
+.attr-row:last-child{border-bottom:none}
+.attr-name{flex:1;font-size:.86rem;color:var(--txt);font-weight:500}
+.attr-desc{font-size:.74rem;color:var(--txt3);display:block;margin-top:.1rem}
+.rating-group{display:flex;gap:.28rem;flex-shrink:0}
+.rbtn{width:34px;height:34px;border-radius:5px;border:2px solid #dde8dd;background:#f8fbf8;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .12s;color:#aaa;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.rbtn:hover{border-color:var(--green);color:var(--green)}
+.rbtn.sel-1{background:var(--rating-1);border-color:var(--rating-1);color:#fff}
+.rbtn.sel-2{background:var(--rating-2);border-color:var(--rating-2);color:#fff}
+.rbtn.sel-3{background:var(--rating-3);border-color:var(--rating-3);color:#222}
+.rbtn.sel-4{background:var(--rating-4);border-color:var(--rating-4);color:#fff}
+.rbtn.sel-5,.rbtn.sel-6,.rbtn.sel-7,.rbtn.sel-8,.rbtn.sel-9,.rbtn.sel-10,
+.rbtn.sel-11,.rbtn.sel-12,.rbtn.sel-13,.rbtn.sel-14,.rbtn.sel-15,
+.rbtn.sel-16,.rbtn.sel-17,.rbtn.sel-18,.rbtn.sel-19,.rbtn.sel-20{background:var(--rating-5);border-color:var(--rating-5);color:#fff}
+
+.rating-scale{display:flex;gap:.18rem;flex-wrap:wrap}
+
+.goal-box{background:#f4fbf4;border:1px solid #c8dcc8;border-radius:7px;padding:.9rem;margin-bottom:.7rem}
+.goal-label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gb);margin-bottom:.45rem}
+
+.wellbeing-row{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:.8rem}
+.wb-group{}
+.wb-label{font-size:.79rem;font-weight:600;color:var(--txt2);margin-bottom:.35rem}
+.wb-btns{display:flex;gap:.3rem}
+.wb-btn{width:38px;height:38px;border-radius:6px;border:2px solid #dde8dd;background:#f8fbf8;font-size:1.1rem;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center}
+.wb-btn:hover{border-color:var(--green)}
+.wb-btn.active{border-color:var(--green);background:var(--light);box-shadow:0 0 0 2px #c8dcc8}
+
+.motivation-btns{display:flex;gap:.3rem}
+.mot-btn{width:38px;height:38px;border-radius:6px;border:2px solid #dde8dd;background:#f8fbf8;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .12s;color:#aaa}
+.mot-btn:hover{border-color:var(--green);color:var(--green)}
+.mot-btn.active{background:var(--green);border-color:var(--green);color:#fff}
+
+.submit-area{text-align:center;padding:1.5rem 0}
+.btn-submit{background:var(--gb);color:#fff;padding:.85rem 2.5rem;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;border:none;letter-spacing:.04em;transition:all .15s;font-family:inherit;display:inline-flex;align-items:center;gap:.5rem}
+.btn-submit:hover{background:#1a4a2e;transform:translateY(-1px)}
+.btn-submit:disabled{background:#aaa;cursor:default;transform:none}
+
+.alert{padding:.8rem 1rem;border-radius:7px;font-size:.84rem;margin-bottom:1rem;line-height:1.5}
+.alert-green{background:#e8f5e9;border:1px solid #a5d6a7;color:#1b5e20}
+.alert-orange{background:#fff3e0;border:1px solid #ffcc80;color:#e65100}
+
+.section-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+
+.progress-bar{height:5px;background:#e8f5e9;border-radius:3px;margin-bottom:1.5rem;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:var(--green);transition:width .3s}
+
+.age-selector{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.age-btn{padding:.42rem .9rem;border-radius:5px;border:1px solid var(--bdr);background:#fff;font-size:.83rem;font-weight:600;cursor:pointer;color:var(--txt2);transition:all .12s}
+.age-btn:hover{border-color:var(--green);color:var(--gb)}
+.age-btn.active{background:var(--light);border-color:var(--green);color:var(--gb)}
+
+.rating-legend{display:flex;gap:.7rem;flex-wrap:wrap;margin-bottom:.8rem;font-size:.73rem}
+.legend-item{display:flex;align-items:center;gap:.28rem}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-strip">
+    <div class="logo-icon">⚽</div>
+    <span style="font-size:1.1rem;font-weight:700;letter-spacing:.06em">FORMATION PRO</span>
+  </div>
+  <h1>Player Self-Reflection</h1>
+  <p>Complete honestly — your coach will use this to support your development</p>
+</div>
+
+<div class="container">
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <!-- PLAYER DETAILS -->
+  <div class="card">
+    <div class="card-header">
+      <div class="section-icon" style="background:#e8f5e9">👤</div>
+      <h2>Your Details</h2>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-orange">
+        ⚠ Make sure your name matches exactly how your coach has entered it in the app — it's used to match your reflection to your profile.
+      </div>
+      <div class="field-group">
+        <label>Full Name *</label>
+        <input type="text" id="playerName" placeholder="e.g. Jamie Smith" oninput="updateProgress()"/>
+      </div>
+      <div class="field-group">
+        <label>Team</label>
+        <input type="text" id="teamName" placeholder="e.g. U12 Reds"/>
+      </div>
+      <div class="field-group">
+        <label>Date</label>
+        <input type="text" id="reflectionDate" placeholder="e.g. March 2026"/>
+      </div>
+      <div class="field-group">
+        <label>Age Group</label>
+        <div class="age-selector" id="ageSelector">
+          <button class="age-btn" onclick="setAge('U7-U10')">U7–U10</button>
+          <button class="age-btn active" onclick="setAge('U11-U14')">U11–U14</button>
+          <button class="age-btn" onclick="setAge('U15-U18')">U15–U18</button>
+          <button class="age-btn" onclick="setAge('Adult')">Adult</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WELLBEING -->
+  <div class="card">
+    <div class="card-header">
+      <div class="section-icon" style="background:#e8f5e9">💚</div>
+      <h2>How Are You Feeling?</h2>
+    </div>
+    <div class="card-body">
+      <div class="wellbeing-row">
+        <div class="wb-group">
+          <div class="wb-label">Motivation to train & improve</div>
+          <div class="motivation-btns">
+            <button class="mot-btn" onclick="setMot(1)">1</button>
+            <button class="mot-btn" onclick="setMot(2)">2</button>
+            <button class="mot-btn" onclick="setMot(3)">3</button>
+            <button class="mot-btn" onclick="setMot(4)">4</button>
+            <button class="mot-btn" onclick="setMot(5)">5</button>
+          </div>
+          <div class="helper">1 = Very low, 5 = Very high</div>
+        </div>
+        <div class="wb-group">
+          <div class="wb-label">Overall happiness in the team</div>
+          <div class="wb-btns">
+            <button class="wb-btn" onclick="setHappy(1)" title="Very unhappy">😞</button>
+            <button class="wb-btn" onclick="setHappy(2)" title="Not great">😐</button>
+            <button class="wb-btn" onclick="setHappy(3)" title="OK">🙂</button>
+            <button class="wb-btn" onclick="setHappy(4)" title="Happy">😊</button>
+            <button class="wb-btn" onclick="setHappy(5)" title="Very happy">😄</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELF RATINGS -->
+  <div class="card">
+    <div class="card-header">
+      <div class="section-icon" style="background:#e8f5e9">⭐</div>
+      <h2>Rate Yourself (1–20)</h2>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-green">
+        Be honest with yourself — there are no wrong answers. Your ratings help your coach understand how you see your own game.
+      </div>
+      <div class="rating-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--rating-1)"></div>1–6 Needs work</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--rating-3)"></div>7–13 Developing</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--rating-5)"></div>14–20 Strong</div>
+      </div>
+      <div id="ratingsContainer"></div>
+    </div>
+  </div>
+
+  <!-- GOALS -->
+  <div class="card">
+    <div class="card-header">
+      <div class="section-icon" style="background:#e8f5e9">🎯</div>
+      <h2>Your Goals</h2>
+    </div>
+    <div class="card-body">
+      <div class="goal-box">
+        <div class="goal-label" style="color:#2e7d32">Short-Term Goal — Next 4 Weeks</div>
+        <textarea id="goalShortTerm" placeholder="What one thing do you most want to improve in the next 4 weeks? Be specific — e.g. improve my left foot, track back more consistently, communicate more with teammates..." oninput="updateProgress()"></textarea>
+      </div>
+      <div class="goal-box">
+        <div class="goal-label" style="color:#1565c0">Season Goal</div>
+        <textarea id="goalSeason" placeholder="What do you want to achieve by the end of the season? e.g. become first-choice striker, improve my overall rating, play every game..."></textarea>
+      </div>
+      <div class="goal-box">
+        <div class="goal-label" style="color:#6a1b9a">Message to Your Coach</div>
+        <textarea id="goalPersonal" placeholder="Anything you want your coach to know? How are you finding training? Any worries, ideas, or things you'd like more of?"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="submit-area">
+    <p style="font-size:.82rem;color:var(--txt3);margin-bottom:.9rem">When you're done, click the button below. A file will download — send it to your coach or they will tell you how to submit it.</p>
+    <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+      ✅ Complete & Download
+    </button>
+    <p id="submitMsg" style="margin-top:.75rem;font-size:.82rem;color:var(--gb);display:none">✓ Downloaded! Send the file to your coach.</p>
+  </div>
+
+</div>
+
+<script>
+// ── ATTRIBUTE SETS (must match app exactly) ───────────────────────────────────
+const ATTRS_YOUTH = {
+  Technical:       {
+    first_touch:           {label:'First Touch',            desc:'How well do you control the ball when it comes to you?'},
+    ball_mastery_dribbling:{label:'Ball Mastery & Dribbling',desc:'Can you keep the ball close and move with it confidently?'},
+    attacking_1v1:         {label:'1v1 Attacking',          desc:'Can you beat a defender one-on-one?'},
+    passing_quality:       {label:'Passing Quality',        desc:'How accurate and well-weighted are your passes?'},
+    receiving_body_shape:  {label:'Receiving & Body Shape', desc:'Do you open up your body to see the pitch when receiving?'},
+    finishing_technique:   {label:'Finishing Technique',    desc:'Can you hit the target when you get a chance?'},
+  },
+  Tactical: {
+    decision_making:   {label:'Decision Making',      desc:'Do you usually pick the right option quickly?'},
+    movement_support:  {label:'Movement to Support',  desc:'Do you move into good positions to help teammates?'},
+    defensive_awareness:{label:'Defensive Awareness', desc:'Do you track your opponent and help defend when needed?'},
+    transition_reaction:{label:'Transition Reaction', desc:'How quickly do you react when your team wins or loses the ball?'},
+  },
+  Physical: {
+    agility_coordination:{label:'Agility & Coordination', desc:'How well can you change direction and control your body?'},
+    work_rate:           {label:'Work Rate',               desc:'How hard do you work for the full game?'},
+    physical_confidence: {label:'Physical Confidence',    desc:'Are you confident in duels and contact situations?'},
+  },
+  Psychological: {
+    coachability:      {label:'Coachability',        desc:'Do you listen, apply feedback, and keep learning?'},
+    confidence_bravery:{label:'Confidence & Bravery',desc:'Do you try things, take risks, and back yourself?'},
+    resilience:        {label:'Resilience',          desc:'Can you bounce back quickly from mistakes or setbacks?'},
+  },
+  Social: {
+    communication: {label:'Communication',         desc:'Do you talk to teammates and organise during the game?'},
+    respect_team:  {label:'Respect & Team Behaviour',desc:'Do you support teammates and behave well in and around the group?'},
+  },
+};
+
+const ATTRS_FULL = {
+  Technical: {
+    first_touch:   {label:'First Touch',    desc:''},
+    passing_short: {label:'Short Passing',  desc:''},
+    passing_long:  {label:'Long Passing',   desc:''},
+    receiving:     {label:'Receiving',      desc:''},
+    dribbling:     {label:'Dribbling',      desc:''},
+    ball_control:  {label:'Ball Control',   desc:''},
+    finishing:     {label:'Finishing',      desc:''},
+    shooting:      {label:'Shooting',       desc:''},
+    crossing:      {label:'Crossing',       desc:''},
+    heading:       {label:'Heading',        desc:''},
+    shielding:     {label:'Shielding',      desc:''},
+  },
+  Physical: {
+    speed:        {label:'Speed',        desc:''},
+    agility:      {label:'Agility',      desc:''},
+    stamina:      {label:'Stamina',      desc:''},
+    strength:     {label:'Strength',     desc:''},
+    coordination: {label:'Coordination', desc:''},
+    reactions:    {label:'Reactions',    desc:''},
+    jumping:      {label:'Jumping',      desc:''},
+  },
+  Tactical: {
+    positioning:          {label:'Positioning',        desc:''},
+    pressing:             {label:'Pressing',           desc:''},
+    transition_attack:    {label:'Trans. Attack',      desc:''},
+    transition_defence:   {label:'Trans. Defence',     desc:''},
+    decision_making:      {label:'Decision Making',    desc:''},
+    scanning_awareness:   {label:'Scanning',           desc:''},
+    shape_and_structure:  {label:'Shape & Structure',  desc:''},
+    width_and_depth:      {label:'Width & Depth',      desc:''},
+    combinations:         {label:'Combinations',       desc:''},
+    defensive_organisation:{label:'Def. Organisation', desc:''},
+  },
+  Mental: {
+    communication:   {label:'Communication',   desc:''},
+    leadership:      {label:'Leadership',      desc:''},
+    composure:       {label:'Composure',       desc:''},
+    concentration:   {label:'Concentration',   desc:''},
+    coachability:    {label:'Coachability',    desc:''},
+    competitiveness: {label:'Competitiveness', desc:''},
+  },
+};
+
+const GRP_LABELS = {Social:'Social / Team', Technical:'Technical', Tactical:'Tactical', Physical:'Physical', Mental:'Mental', Psychological:'Psychological'};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentAge = 'U11-U14';
+let ratings = {};
+let motivation = 0;
+let happiness = 0;
+
+function getAttrSet() {
+  return (currentAge === 'U7-U10' || currentAge === 'U11-U14') ? ATTRS_YOUTH : ATTRS_FULL;
+}
+
+function setAge(age) {
+  currentAge = age;
+  ratings = {};
+  document.querySelectorAll('.age-btn').forEach(b => b.classList.toggle('active', b.textContent.replace('–','-') === age.replace('–','-') || b.textContent === age));
+  renderRatings();
+  updateProgress();
+}
+
+function renderRatings() {
+  const container = document.getElementById('ratingsContainer');
+  const attrs = getAttrSet();
+  container.innerHTML = Object.entries(attrs).map(([grp, attrMap]) => {
+    const grpLabel = GRP_LABELS[grp] || grp;
+    const rows = Object.entries(attrMap).map(([key, info]) => `
+      <div class="attr-row">
+        <div class="attr-name">${info.label}${info.desc ? `<span class="attr-desc">${info.desc}</span>` : ''}</div>
+        <div class="rating-scale" id="scale_${key}">
+          ${Array.from({length:20},(_,i)=>`<button class="rbtn" onclick="setRating('${key}',${i+1})" id="r_${key}_${i+1}">${i+1}</button>`).join('')}
+        </div>
+      </div>
+    `).join('');
+    return `
+      <div style="margin-bottom:1.1rem">
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--txt3);margin-bottom:.4rem;padding:.3rem 0;border-bottom:2px solid var(--light)">${grpLabel}</div>
+        ${rows}
+      </div>
+    `;
+  }).join('');
+  // Re-apply any existing ratings
+  Object.entries(ratings).forEach(([k,v]) => highlightRating(k,v));
+}
+
+function setRating(key, val) {
+  ratings[key] = val;
+  highlightRating(key, val);
+  updateProgress();
+}
+
+function highlightRating(key, val) {
+  for (let i=1; i<=20; i++) {
+    const btn = document.getElementById(`r_${key}_${i}`);
+    if (!btn) continue;
+    btn.className = 'rbtn' + (i === val ? ` sel-${val}` : '');
+  }
+}
+
+function setMot(v) {
+  motivation = v;
+  document.querySelectorAll('.mot-btn').forEach((b,i) => b.classList.toggle('active', i+1 <= v));
+}
+
+function setHappy(v) {
+  happiness = v;
+  document.querySelectorAll('.wb-btn').forEach((b,i) => b.classList.toggle('active', i+1 === v));
+}
+
+function updateProgress() {
+  const attrs = getAttrSet();
+  const total = Object.values(attrs).reduce((s,g) => s+Object.keys(g).length, 0);
+  const rated = Object.keys(ratings).length;
+  const hasName = document.getElementById('playerName').value.trim().length > 0;
+  const hasGoal = document.getElementById('goalShortTerm').value.trim().length > 0;
+  const pct = Math.round(((rated/total)*60 + (hasName?20:0) + (hasGoal?20:0)));
+  document.getElementById('progressFill').style.width = Math.min(100,pct) + '%';
+}
+
+function submitForm() {
+  const name = document.getElementById('playerName').value.trim();
+  if (!name) { alert('Please enter your name before submitting.'); return; }
+
+  const data = {
+    _type: 'frp_self_reflection',
+    _version: '1.0',
+    playerName: name,
+    teamName: document.getElementById('teamName').value.trim(),
+    reflectionDate: document.getElementById('reflectionDate').value.trim() || new Date().toISOString().slice(0,10),
+    ageGroup: currentAge,
+    wellbeing: { motivation, happiness },
+    selfRatings: {...ratings},
+    goals: {
+      shortTerm: document.getElementById('goalShortTerm').value.trim(),
+      season: document.getElementById('goalSeason').value.trim(),
+      personal: document.getElementById('goalPersonal').value.trim(),
+    }
+  };
+
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `self_reflection_${name.replace(/\s+/g,'_')}_${data.reflectionDate}.json`;
+  a.click();
+
+  document.getElementById('submitMsg').style.display = 'block';
+  document.getElementById('submitBtn').textContent = '✓ Downloaded';
+  document.getElementById('progressFill').style.width = '100%';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderRatings();
+document.getElementById('reflectionDate').value = new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+</script>
+</body>
+</html>
