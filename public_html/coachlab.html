@@ -451,10 +451,10 @@ function App() {
   const [tab, setTab] = useState('home');
   const [catalogue, setCatalogue] = useState([]);
   const [catLoaded, setCatLoaded] = useState(false);
+  const [catError, setCatError] = useState('');
   const [showTeamManager, setShowTeamManager] = useState(false);
   const [dataReady, setDataReady] = useState(false);
   const [dataStatus, setDataStatus] = useState('');
-  const catRef = useRef();
 
   const resolvedActiveId = teams.find(t=>t.id===activeTeamId) ? activeTeamId : teams[0]?.id;
   const team = teams.find(t=>t.id===resolvedActiveId)||teams[0];
@@ -510,24 +510,34 @@ function App() {
     return ()=>clearTimeout(timeout);
   }, [teams, activeTeamId, resolvedActiveId, dataReady]);
 
-  function loadCatalogue(file) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        const wb = XLSX.read(e.target.result,{type:'array'});
+  useEffect(() => {
+    let active = true;
+    fetch('/coachlab/api/session_catalogue.csv')
+      .then(async res => {
+        const text = await res.text();
+        if (!res.ok) throw new Error(text || `Could not load session catalogue (${res.status})`);
+        const wb = XLSX.read(text, {type:'string'});
         const ws = wb.Sheets[wb.SheetNames[0]];
         const raw = XLSX.utils.sheet_to_json(ws,{header:1});
-        const fields = raw[1];
+        const fields = raw[1] || [];
         const sessions = raw.slice(2).map(row=>{
           const obj={};
           fields.forEach((f,i)=>{if(f) obj[f]=row[i]!=null?row[i]:null;});
           return obj;
         }).filter(s=>s.practice_name);
-        setTimeout(()=>{setCatalogue(sessions);setCatLoaded(true);},0);
-      } catch(err){alert('Error loading catalogue: '+err.message);}
-    };
-    reader.readAsArrayBuffer(file);
-  }
+        if (!active) return;
+        setCatalogue(sessions);
+        setCatLoaded(true);
+        setCatError('');
+      })
+      .catch(err => {
+        if (!active) return;
+        setCatalogue([]);
+        setCatLoaded(false);
+        setCatError(err.message || 'Could not load session catalogue.');
+      });
+    return ()=>{ active = false; };
+  }, []);
 
   function importSquad(file) {
     const reader = new FileReader();
@@ -627,8 +637,7 @@ function App() {
         <div className="topbar-right">
           {catLoaded
             ?<span className="bdg bdg-g">📚 {catalogue.length.toLocaleString()}</span>
-            :<button className="btn btn-s btn-sm" onClick={()=>catRef.current&&catRef.current.click()}>📂 Load Catalogue</button>}
-          <input type="file" ref={catRef} accept=".xlsx" style={{display:'none'}} onChange={e=>{if(e.target.files[0])loadCatalogue(e.target.files[0]);}}/>
+            :<span className="bdg bdg-o">📚 Loading…</span>}
           <div style={{display:'flex',gap:'.3rem',alignItems:'center'}}>
             {teams.map(t=>(
               <button key={t.id} className={'team-pill'+(t.id===activeTeamId?' active':'')} onClick={()=>setActiveTeamId(t.id)}>
@@ -641,11 +650,11 @@ function App() {
       </div>
 
       <div className="main">
-        {tab==='home'&&<HomeTab teams={teams} setActiveTeamId={setActiveTeamId} setTab={setTab} catalogue={catalogue}/>}
-        {tab==='home'&&<HomeTab teams={teams} setActiveTeamId={setActiveTeamId} setTab={setTab} catalogue={catalogue}/>}
+        {tab==='home'&&<HomeTab teams={teams} setActiveTeamId={setActiveTeamId} setTab={setTab} catalogue={catalogue} catError={catError}/>}
+        {tab==='home'&&<HomeTab teams={teams} setActiveTeamId={setActiveTeamId} setTab={setTab} catalogue={catalogue} catError={catError}/>}
         {tab==='squad'&&<SquadTab team={team} updateTeam={updateTeam} importSquad={importSquad} runAnalysis={runAnalysis}/>}
         {tab==='formation'&&<FormationTab team={team} updateTeam={updateTeam} availFormations={availFormations}/>}
-        {tab==='sessions'&&<SessionsTab recommendations={recommendations} maxScore={maxScore} catLoaded={catLoaded} team={team} runAnalysis={runAnalysis}/>}
+        {tab==='sessions'&&<SessionsTab recommendations={recommendations} maxScore={maxScore} catLoaded={catLoaded} team={team} runAnalysis={runAnalysis} catError={catError}/>}
         {tab==='season'&&<SeasonTab team={team} updateTeam={updateTeam} recommendations={recommendations} catLoaded={catLoaded}/>}
         {tab==='gamemodel'&&<GameModelTab team={team} updateTeam={updateTeam}/>}
         {tab==='depth'&&<DepthChartTab team={team}/>}
@@ -1229,7 +1238,7 @@ function FormationTab({team,updateTeam,availFormations}) {
 
 // ─── SESSIONS TAB ─────────────────────────────────────────────────────────────
 
-function SessionsTab({recommendations,maxScore,catLoaded,team,runAnalysis}) {
+function SessionsTab({recommendations,maxScore,catLoaded,team,runAnalysis,catError}) {
   const [view,setView]=useState('plan');
   const [catF,setCatF]=useState('all');
   const [phaseF,setPhaseF]=useState('all');
@@ -1251,8 +1260,8 @@ function SessionsTab({recommendations,maxScore,catLoaded,team,runAnalysis}) {
   if(!catLoaded) return (
     <div className="empty" style={{paddingTop:'4rem'}}>
       <div className="empty-icon">📚</div>
-      <div className="empty-title">Catalogue Not Loaded</div>
-      <p style={{fontSize:'.81rem',marginBottom:'1.1rem'}}>Click <strong>Load Catalogue</strong> in the top bar and select your <strong>session_catalogue_MASTER_v3.xlsx</strong></p>
+      <div className="empty-title">Catalogue Loading</div>
+      <p style={{fontSize:'.81rem',marginBottom:'1.1rem'}}>Reading sessions from <strong>api/session_catalogue.csv</strong>{catError?` (${catError})`:''}</p>
     </div>
   );
 
@@ -1627,7 +1636,7 @@ function SessionPickerModal({recommendations,catLoaded,onPick,onClose}) {
               <button key={id} className={'btn btn-xs '+(catF===id?'btn-p':'btn-s')} onClick={()=>setCatF(id)}>{lbl}</button>
             ))}
           </div>
-          {!catLoaded&&<div className="alert-i" style={{marginBottom:'.75rem'}}>Load the catalogue first to search sessions</div>}
+          {!catLoaded&&<div className="alert-i" style={{marginBottom:'.75rem'}}>Loading session catalogue from <strong>api/session_catalogue.csv</strong></div>}
           <div className="scroll" style={{maxHeight:'380px'}}>
             {filtered.map(s=>(
               <div key={s.practice_name+s.source_book} style={{padding:'.55rem .75rem',borderBottom:'1px solid var(--bdr2)',cursor:'pointer',transition:'background .1s'}} onClick={()=>onPick(s)} onMouseEnter={e=>e.currentTarget.style.background='var(--sur2)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
@@ -2410,7 +2419,7 @@ function DepthChartTab({team}) {
 // HOME TAB
 // ═══════════════════════════════════════════════════════════════
 
-function HomeTab({teams, setActiveTeamId, setTab, catalogue}) {
+function HomeTab({teams, setActiveTeamId, setTab, catalogue, catError}) {
   const today = new Date().toISOString().slice(0,10);
   function goTo(teamId, tab) { setActiveTeamId(teamId); setTab(tab); }
   return (
@@ -2421,9 +2430,9 @@ function HomeTab({teams, setActiveTeamId, setTab, catalogue}) {
         </h2>
         <p style={{color:'var(--txt2)',fontSize:'.85rem'}}>Your coaching workspace — {teams.length} team{teams.length!==1?'s':''} loaded.</p>
       </div>
-      {!catalogue&&(
+      {!catalogue.length&&(
         <div style={{background:'rgba(210,153,34,.1)',border:'1px solid var(--org)',borderRadius:'7px',padding:'.75rem 1rem',marginBottom:'1.2rem',fontSize:'.82rem',color:'var(--ob)'}}>
-          ⚠ Session catalogue not loaded — click <strong>Load Catalogue</strong> in the top bar to enable session recommendations.
+          ⚠ Session catalogue is still loading from <strong>api/session_catalogue.csv</strong>{catError?`: ${catError}`:''}
         </div>
       )}
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))',gap:'1rem'}}>

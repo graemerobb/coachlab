@@ -384,6 +384,12 @@ function updateProgress() {
 }
 
 function submitForm() {
+  submitFormAsync().catch(err=>{
+    alert('Could not save reflection: ' + err.message);
+  });
+}
+
+async function submitFormAsync() {
   const name = document.getElementById('playerName').value.trim();
   if (!name) { alert('Please enter your name before submitting.'); return; }
 
@@ -404,6 +410,17 @@ function submitForm() {
   };
 
   const json = JSON.stringify(data, null, 2);
+  const res = await fetch('/coachlab/api/save_reflection.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: json,
+  });
+  const text = await res.text();
+  let payload = null;
+  try { payload = text ? JSON.parse(text) : null; } catch(e) {}
+  if (!res.ok) {
+    throw new Error(payload?.error || text || `Save failed (${res.status})`);
+  }
   const blob = new Blob([json], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
