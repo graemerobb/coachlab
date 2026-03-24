@@ -1776,11 +1776,13 @@ function PlayersTab({team,updateTeam}) {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(buildSnapshotPayload(player, team, snapshot)),
     });
-    const data = await res.json().catch(()=>null);
+    const text = await res.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch(e) {}
     if (!res.ok) {
-      throw new Error(data?.error || data?.message || `Snapshot save failed (${res.status})`);
+      throw new Error(data?.error || data?.message || text || `Snapshot save failed (${res.status})`);
     }
-    return data;
+    return data || {ok:true};
   }
 
   if(!team.squad.length) return(
