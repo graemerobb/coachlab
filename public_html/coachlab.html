@@ -433,28 +433,27 @@ function buildDefaultSeason() {
 function newPlayer(name='',pos='CM') {
   return {id:uid(),name,primaryPos:pos,secondaryPos:[],attributes:{},coachRatings:{},coachRatingCategories:buildCategorizedRatings('U15-U18',{}),selfRatings:{},selfRatingCategories:buildCategorizedRatings('U15-U18',{}),notes:'',wellbeing:{motivation:0,happiness:0},goals:{},snapshots:[],idpTargets:{},idpActions:'',idpReviewDate:''};
 }
+function fetchJson(url, options) {
+  return fetch(url, options).then(async res => {
+    const text = await res.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch(e) {}
+    if (!res.ok) throw new Error(data?.error || data?.message || text || `Request failed (${res.status})`);
+    return data;
+  });
+}
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 
 function App() {
-  const [teams, setTeams] = useState(() => {
-    try {
-      const saved = localStorage.getItem('frp_teams');
-      if (saved) { const parsed = JSON.parse(saved); if (parsed && parsed.length) return parsed.map(normalizeTeam); }
-    } catch(e) {}
-    return [newTeam('My Team')];
-  });
-  const [activeTeamId, setActiveTeamId] = useState(() => {
-    try {
-      const saved = localStorage.getItem('frp_activeTeam');
-      if (saved) return saved;
-    } catch(e) {}
-    return null;
-  });
+  const [teams, setTeams] = useState([newTeam('My Team')]);
+  const [activeTeamId, setActiveTeamId] = useState(null);
   const [tab, setTab] = useState('home');
   const [catalogue, setCatalogue] = useState([]);
   const [catLoaded, setCatLoaded] = useState(false);
   const [showTeamManager, setShowTeamManager] = useState(false);
+  const [dataReady, setDataReady] = useState(false);
+  const [dataStatus, setDataStatus] = useState('');
   const catRef = useRef();
 
   const resolvedActiveId = teams.find(t=>t.id===activeTeamId) ? activeTeamId : teams[0]?.id;
@@ -478,13 +477,38 @@ function App() {
     if(activeTeamId===id) setActiveTeamId(remaining[0].id);
   }
 
-  // Persist to localStorage whenever teams change
   useEffect(() => {
-    try { localStorage.setItem('frp_teams', JSON.stringify(teams)); } catch(e) {}
-  }, [teams]);
+    let active = true;
+    fetchJson('/coachlab/api/load_player_data.php')
+      .then(data => {
+        if (!active) return;
+        const loadedTeams = Array.isArray(data?.teams) && data.teams.length ? data.teams.map(normalizeTeam) : [newTeam('My Team')];
+        setTeams(loadedTeams);
+        setActiveTeamId(data?.activeTeamId || loadedTeams[0]?.id || null);
+        setDataReady(true);
+      })
+      .catch(() => {
+        if (!active) return;
+        setTeams([newTeam('My Team')]);
+        setActiveTeamId(null);
+        setDataReady(true);
+      });
+    return ()=>{ active = false; };
+  }, []);
   useEffect(() => {
-    try { localStorage.setItem('frp_activeTeam', activeTeamId); } catch(e) {}
-  }, [activeTeamId]);
+    if (!dataReady) return;
+    const payload = {teams, activeTeamId: resolvedActiveId || activeTeamId || teams[0]?.id || null};
+    const timeout = setTimeout(() => {
+      fetchJson('/coachlab/api/save_player_data.php', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload),
+      })
+        .then(()=>setDataStatus(''))
+        .catch(err=>setDataStatus(err.message || 'Could not save player data.'));
+    }, 250);
+    return ()=>clearTimeout(timeout);
+  }, [teams, activeTeamId, resolvedActiveId, dataReady]);
 
   function loadCatalogue(file) {
     const reader = new FileReader();
@@ -570,8 +594,28 @@ function App() {
     {id:'players',label:'Players'},
   ];
 
+  if(!dataReady) return (
+    <div className="shell">
+      <div className="main" style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'60vh'}}>
+        <div className="card" style={{maxWidth:'420px',width:'100%'}}>
+          <div className="cb" style={{textAlign:'center',padding:'1.8rem'}}>
+            <div style={{fontWeight:700,color:'var(--gb)',marginBottom:'.35rem'}}>Loading player data…</div>
+            <div style={{fontSize:'.8rem',color:'var(--txt3)'}}>Reading teams and player records from the filesystem</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="shell">
+      {dataStatus&&(
+        <div style={{maxWidth:'1400px',width:'100%',margin:'0 auto',padding:'1rem 1.25rem 0'}}>
+          <div style={{padding:'.7rem .9rem',borderRadius:'6px',fontSize:'.8rem',background:'rgba(218,54,51,.12)',border:'1px solid var(--red)',color:'var(--rb)'}}>
+            {dataStatus}
+          </div>
+        </div>
+      )}
       <div className="topbar">
         <div className="logo">
           <div className="logo-icon">⚽</div>
@@ -635,7 +679,7 @@ function TeamManager({teams,activeTeamId,setActiveTeamId,addTeam,deleteTeam,upda
           </div>
         </div>
         <div style={{padding:'1rem'}}>
-          <p style={{fontSize:'.78rem',color:'var(--txt2)',marginBottom:'.85rem'}}>Teams are automatically saved to your browser. Click a team name to rename it.</p>
+          <p style={{fontSize:'.78rem',color:'var(--txt2)',marginBottom:'.85rem'}}>Teams and player data are automatically saved to the server filesystem. Click a team name to rename it.</p>
           {teams.map(t=>(
             <div key={t.id} style={{display:'flex',alignItems:'center',gap:'.55rem',padding:'.65rem .85rem',background:t.id===activeTeamId?'rgba(63,185,80,.07)':'var(--sur2)',borderRadius:'7px',marginBottom:'.4rem',border:'1px solid '+(t.id===activeTeamId?'var(--green)':'var(--bdr)')}}>
               <div style={{flex:1}}>
@@ -665,7 +709,7 @@ function TeamManager({teams,activeTeamId,setActiveTeamId,addTeam,deleteTeam,upda
           <div className="sep"/>
           <div style={{display:'flex',alignItems:'center',gap:'.6rem'}}>
             <button className="btn btn-p btn-sm" onClick={addTeam}>+ New Team</button>
-            <span style={{fontSize:'.74rem',color:'var(--txt3)'}}>All data saved automatically in browser storage</span>
+            <span style={{fontSize:'.74rem',color:'var(--txt3)'}}>All data saved automatically to filesystem storage</span>
           </div>
         </div>
       </div>
